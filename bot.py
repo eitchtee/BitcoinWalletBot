@@ -1,3 +1,5 @@
+from random import choice
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, Filters, CallbackQueryHandler)
 from telegram.ext.dispatcher import run_async
@@ -79,9 +81,16 @@ def start(bot, update):
 def answer_handler(bot, update):
     query = update.callback_query.data
 
+    possible_texts = ['Updating..._',
+                      'Updating.._',
+                      'Updating...._',
+                      '_Retrieving information.._',
+                      '_Retrieving information..._',
+                      '_Retrieving information...._']
+
     if query == 'update':
         bot.edit_message_text(
-            text='_Updating..._',
+            text=choice(possible_texts),
             chat_id=update.callback_query.message.chat_id,
             message_id=update.callback_query.message.message_id,
             reply_markup=buttons('no_input'),
@@ -96,7 +105,7 @@ def answer_handler(bot, update):
 
     elif query == 'transactions':
         bot.edit_message_text(
-            text='_Updating..._',
+            text=choice(possible_texts),
             chat_id=update.callback_query.message.chat_id,
             message_id=update.callback_query.message.message_id,
             reply_markup=buttons('no_input'),
