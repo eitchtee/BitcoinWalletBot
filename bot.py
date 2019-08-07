@@ -43,7 +43,7 @@ def gui_text():
         MONEY_FORMAT)
     btc_value_fmtd = Money(str(btc_value), MONEY).format(MONEY_FORMAT)
 
-    txt = '*Bitcoin Wallet Manager*\n\n' \
+    txt = '*Bitcoin Wallet Viewer*\n\n' \
           '💰 *{}* confirmed btc.\n' \
           '💸 *{}* non confirmed btc.\n' \
           '💱 *{}* in total.\n\n' \
@@ -60,12 +60,12 @@ def tx_history(wallet: str):
 
     if txs_list:
         del txs_list[9:]
-        resultado = ['*Transactions*\n']
+        result = ['*Transactions*\n']
         for tx in txs_list:
             pretty_tx = '📅 {}\n💰 {} btc\n'.format(tx[0], tx[1])
-            resultado.append(pretty_tx)
+            result.append(pretty_tx)
 
-        return '\n'.join(resultado)
+        return '\n'.join(result)
     else:
         return '_No transactions to show._'
 
