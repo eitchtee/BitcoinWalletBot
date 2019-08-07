@@ -2,7 +2,6 @@ from random import choice
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, Filters, CallbackQueryHandler)
-from telegram.ext.dispatcher import run_async
 from config import TELEGRAM_BOT_TOKEN, TELEGRAM_USER_ID, BITCOIN_WALLET, MONEY,\
     MONEY_FORMAT
 
@@ -77,7 +76,6 @@ def start(bot, update):
                               parse_mode='Markdown')
 
 
-@run_async
 def answer_handler(bot, update):
     query = update.callback_query.data
 
@@ -119,7 +117,6 @@ def answer_handler(bot, update):
             parse_mode='Markdown')
 
 
-# @run_async
 def error(bot, update, erro):
     print('Update "{}" caused error "{}"'.format(update, erro))
 
