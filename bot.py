@@ -1,4 +1,5 @@
 from random import choice
+import datetime
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, Filters, CallbackQueryHandler)
@@ -8,6 +9,17 @@ from config import TELEGRAM_BOT_TOKEN, TELEGRAM_USER_ID, BITCOIN_WALLET, MONEY,\
 from api import final_balance, convert_to_money, get_txs
 
 from money.money import Money
+
+
+def bitcoin_refresh_handler(bot, job):
+    menu = job.context
+    msg = gui_text()
+    bot.edit_message_text(
+        text=msg,
+        chat_id=menu.chat.id,
+        message_id=menu.message_id,
+        reply_markup=buttons(),
+        parse_mode='Markdown')
 
 
 def buttons(tipo: str = 'main'):
@@ -42,14 +54,18 @@ def gui_text():
         MONEY_FORMAT)
     btc_value_fmtd = Money(str(btc_value), MONEY).format(MONEY_FORMAT)
 
+    updated_at = datetime.datetime.now().strftime('%d/%m/%Y at %H:%M')
+
     txt = '*Bitcoin Wallet Viewer*\n\n' \
           '💰 *{}* confirmed btc.\n' \
           '💸 *{}* non confirmed btc.\n' \
           '💱 *{}* in total.\n\n' \
-          '📈 *1BTC* currently is worth *{}*'.format(balance,
-                                                    balance_not_confirmed,
-                                                    str(balance_money_fmtd),
-                                                    str(btc_value_fmtd))
+          '📈 *1BTC* currently is worth *{}*\n\n\n\n' \
+          '_🕗 Updated on {}_'.format(balance,
+                                     balance_not_confirmed,
+                                     str(balance_money_fmtd),
+                                     str(btc_value_fmtd),
+                                     updated_at)
 
     return txt
 
@@ -69,11 +85,15 @@ def tx_history(wallet: str):
         return '_No transactions to show._'
 
 
-def start(bot, update):
+def start(bot, update, job_queue):
     # Send the message with menu
-    update.message.reply_text(gui_text(),
-                              reply_markup=buttons(),
-                              parse_mode='Markdown')
+    menu = update.message.reply_text(gui_text(),
+                                     reply_markup=buttons(),
+                                     parse_mode='Markdown')
+    # Updates the display every 15 minutes
+    if len(job_queue.jobs()) < 1:
+        job_queue.run_repeating(
+            bitcoin_refresh_handler, 900, first=60, context=menu)
 
 
 def answer_handler(bot, update):
@@ -125,7 +145,8 @@ def main():
     updater = Updater(TELEGRAM_BOT_TOKEN)
 
     updater.dispatcher.add_handler(
-        CommandHandler('start', start, Filters.user(TELEGRAM_USER_ID)))
+        CommandHandler('start', start, Filters.user(TELEGRAM_USER_ID),
+                       pass_job_queue=True))
     updater.dispatcher.add_handler(CallbackQueryHandler(answer_handler))
     updater.dispatcher.add_error_handler(error)
     # Start the Bot
