@@ -1,0 +1,41 @@
+{
+  "bot": {
+    "title": "Bitcoin Wallet Viewer",
+    "telegram_token": "",
+    "allowed_user_ids": [],
+    "update_each": 3600,
+    "date_format": "%d/%m/%Y",
+    "hour_format": "%H:%M"
+  },
+
+  "money": {
+    "currency": "USD",
+    "currency_format": "en_US"
+  },
+
+  "wallets": [{
+    "name": "Test Wallet",
+    "adress": ""
+  }],
+
+  "strings": {
+    "title": ["*{title}*", "", ""],
+    "wallet_view": ["*{wallet}*",
+    "\uD83D\uDCB0 *{btc_balance}* BTC.",
+      "\uD83D\uDCB1 *{money_balance}* in {currency}."],
+    "failed_wallet_view": ["*{wallet}*",
+      "_Unable to fetch information about this wallet._"],
+    "extra_content": ["","",
+      "\uD83D\uDCC8 *1BTC* is worth *{btc_value}*",
+      "", "",
+      "_\uD83D\uDD57 Last update: {update_date} at {update_time}_"],
+    "update_strings": ["Updating..",
+      "Updating...",
+      "Fetching information..",
+      "Fetching information...",
+      "_Retrieving information.._",
+      "_Retrieving information..._"
+    ],
+    "update_button": "\uD83D\uDD04"
+  }
+}
