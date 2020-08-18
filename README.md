@@ -79,20 +79,20 @@ updating:
 When you are updating your strings, you can use some tags to display specific information. They are:
 
 
-- ``{title}``: bot title as specified on your config.json
-- ``{update_date}``: date
-- ``{update_time}``: time
+- ``{title}``: bot title as specified on your config.yml
+- ``{update_date}``: date of the last update
+- ``{update_time}``: time of last update
 - ``{btc_value}``: the current value of 1 BTC
 - ``{currency}``: the currency code you specified (e.g. ``USD``)
 
 
 #### ``wallet_view`` tags
-These tags are only avaliable to use when editing the wallet_view section. They are:
+Some tags are only avaliable to use when editing the wallet_view section. _Normal tags also apply_. They are:
 
-- ``{btc_balance}``: the balance in BTC of the wallet
-- ``{money_balance}``: the balance of the wallet in currency
-- ``{wallet}``: the name of the wallet. This is also avaliable on the wallet_view_falied section
-- ``{wallet_address}``: the address of the wallet. This is also avaliable on the wallet_view_falied section
+- ``{btc_balance}``: the wallet's BTC balance
+- ``{money_balance}``: the wallet's BTC balance converted to currency
+- ``{wallet}``: the wallet's name. _This is also avaliable on the wallet_view_falied section._
+- ``{wallet_address}``: the wallet's address. _This is also avaliable on the wallet_view_falied section_
 
 
 ## Contributing
