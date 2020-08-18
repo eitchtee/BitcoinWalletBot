@@ -183,7 +183,7 @@ def main():
 
     updater.dispatcher.add_handler(
         CommandHandler('start', start,
-                       Filters.user(configs.allowed_users)))
+                       Filters.user(configs.allowed_users, allow_empty=True)))
     updater.dispatcher.add_handler(CallbackQueryHandler(answer_handler))
     updater.dispatcher.add_error_handler(error_callback)
 
