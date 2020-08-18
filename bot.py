@@ -3,6 +3,7 @@ import datetime
 import json
 import logging
 
+import yaml
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (Updater, CommandHandler, Filters,
                           CallbackQueryHandler)
@@ -20,6 +21,32 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %('
 logger = logging.getLogger(__name__)
 
 
+class Configs:
+    def __init__(self):
+        with open('configs.yml', encoding='utf8') as file:
+            data = yaml.load(file, Loader=yaml.FullLoader)
+
+        self.title = data.get("bot_title", "Bitcoin Bot")
+        self.token = data["telegram_token"]
+        self.allowed_users = data.get("allowed_user_ids", [])
+        self.update_time = data.get("update_each", 3600)
+        self.date_frmt = data.get("date_format", "%d/%m/%Y")
+        self.hour_frmt = data.get("hour_format", "%H:%M")
+        self.money = data["money"]
+        self.money_frmt = data["money_format"]
+        self.wallets = data['wallets']
+
+        self.str_title = data.get("title", "Bitcoin Bot")
+        self.str_wallet_view = data["wallet_view"]
+        self.str_fail_wallet_view = data["failed_wallet_view"]
+        self.str_extra_content = data.get("extra_content", "")
+        self.str_update_button = data.get("update_button", "🔄")
+
+        self.str_placeholder = data["updating"]
+
+        print(self.wallets)
+
+
 def get_configs():
     # Reading the file everytime allows for changes while the bot is running
     with open("configs.json", 'r') as f:
@@ -28,8 +55,8 @@ def get_configs():
 
 
 def start(update, context):
-    configs = get_configs()
-    update_delay = configs["bot"]["update_each"]
+    configs = Configs()
+    update_delay = configs.update_time
 
     # Send the message with menu
     menu = update.message.reply_text(gui_text(),
@@ -46,10 +73,10 @@ def start(update, context):
 
 def bitcoin_refresh_handler(context):
     menu = context.job.context
-    updating_txt = get_configs()["strings"]["update_strings"]
+    configs = Configs()
 
     context.bot.edit_message_text(
-        text=choice(updating_txt),
+        text=choice(configs.str_placeholder),
         chat_id=menu.chat.id,
         message_id=menu.message_id,
         reply_markup=buttons("no_input"),
@@ -65,75 +92,67 @@ def bitcoin_refresh_handler(context):
 
 def gui_text():
     configs = get_configs()
-    bot_configs = configs["bot"]
-    wallets = configs["wallets"]
-    money_configs = configs["money"]
-    strings = configs["strings"]
+    c = Configs()
 
-    bot_title = bot_configs["title"]
+    currency = getattr(Currency, c.money)
 
-    currency_txt = money_configs["currency"]
-    currency = getattr(Currency, currency_txt)
-    money_format = money_configs["currency_format"]
+    update_date = datetime.datetime.now().strftime(c.date_frmt)
+    update_hour = datetime.datetime.now().strftime(c.hour_frmt)
 
-    update_date = datetime.datetime.now().strftime(bot_configs["date_format"])
-    update_hour = datetime.datetime.now().strftime(bot_configs["hour_format"])
-
-    placeholder, one_btc_value = convert_to_money(1, currency_txt)
+    placeholder, one_btc_value = convert_to_money(1, c.money)
     one_btc_value_frmt = Money(str(one_btc_value), currency). \
-        format(money_format)
+        format(c.money_frmt)
 
-    start_replacements = {"title": bot_title,
+    start_replacements = {"title": c.title,
                           "update_date": update_date,
                           "update_time": update_hour,
                           "btc_value": one_btc_value_frmt,
-                          "currency": currency_txt}
+                          "currency": c.money}
 
-    txt = ["\n".join(strings["title"]).format(**start_replacements)]
+    txt = ["\n".join(c.str_title).format(**start_replacements)]
 
-    for wallet in wallets:
+    for wallet in c.wallets:
         wallet_name = wallet["name"]
         wallet_addr = wallet['address']
         balance_btc = final_balance(wallet_addr)
         if balance_btc is not None:
             balance_money, btc_value = convert_to_money(balance_btc,
-                                                        currency_txt)
+                                                        c.money)
             balance_money = Money(str(balance_money),
-                                  currency).format(money_format)
+                                  currency).format(c.money_frmt)
 
             wallet_replacements = {"btc_balance": balance_btc,
                                    "money_balance": balance_money,
                                    "wallet": wallet_name,
                                    "wallet_address": wallet_addr}
 
-            txt.append("\n".join(strings["wallet_view"]).
+            txt.append("\n".join(c.str_wallet_view).
                        format(**wallet_replacements, **start_replacements))
         else:
             wallet_replacements = {"wallet": wallet_name,
                                    "wallet_address": wallet_addr}
 
-            txt.append("\n".join(strings["wallet_view"]).
+            txt.append("\n".join(c.str_fail_wallet_view).
                        format(**wallet_replacements, **start_replacements))
 
-    txt.append("\n".join(strings["extra_content"]).format(**start_replacements))
+    txt.append("\n".join(c.str_extra_content).format(**start_replacements))
 
     return ''.join(txt)
 
 
 def buttons(tipo: str = 'main'):
-    configs = get_configs()
-    strings = configs["strings"]
+    configs = Configs()
 
     keyboard = []
     if tipo == 'main':
         keyboard = [
-            [InlineKeyboardButton(strings["update_button"],
+            [InlineKeyboardButton(configs.str_update_button,
                                   callback_data='update'), ],
         ]
 
     elif tipo == 'no_input':
         keyboard = [
-            [InlineKeyboardButton(strings["update_button"],
+            [InlineKeyboardButton(configs.str_update_button,
                                   callback_data='update'), ],
         ]
 
@@ -145,12 +164,11 @@ def buttons(tipo: str = 'main'):
 def answer_handler(update, context):
     query = update.callback_query.data
 
-    configs = get_configs()
-    updating_texts = configs["strings"]["update_strings"]
+    configs = Configs()
 
     if query == 'update':
         context.bot.edit_message_text(
-            text=choice(updating_texts),
+            text=choice(configs.str_placeholder),
             chat_id=update.callback_query.message.chat_id,
             message_id=update.callback_query.message.message_id,
             reply_markup=buttons('no_input'),
@@ -169,13 +187,13 @@ def error_callback(update, context):
 
 
 def main():
-    configs = get_configs()
+    configs = Configs()
 
-    updater = Updater(configs["bot"]["telegram_token"], use_context=True)
+    updater = Updater(configs.token, use_context=True)
 
     updater.dispatcher.add_handler(
         CommandHandler('start', start,
-                       Filters.user(configs["bot"]["allowed_user_ids"])))
+                       Filters.user(configs.allowed_users)))
     updater.dispatcher.add_handler(CallbackQueryHandler(answer_handler))
     updater.dispatcher.add_error_handler(error_callback)
 
@@ -186,4 +204,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    Configs()
