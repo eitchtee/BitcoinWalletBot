@@ -44,15 +44,6 @@ class Configs:
 
         self.str_placeholder = data["updating"]
 
-        print(self.wallets)
-
-
-def get_configs():
-    # Reading the file everytime allows for changes while the bot is running
-    with open("configs.json", 'r') as f:
-        configs = json.load(f)
-    return configs
-
 
 def start(update, context):
     configs = Configs()
