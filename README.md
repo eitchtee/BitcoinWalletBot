@@ -9,7 +9,7 @@
 
 <p align="center">
     <a href="#getting-started">Getting Started</a> |
-    <a href="#onfiguration">Configuration</a> |
+    <a href="#configuration">Configuration</a> |
     <a href="#contributing">Contributing</a> |
     <a href="#license">License</a>
 </p>
