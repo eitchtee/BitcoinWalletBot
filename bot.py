@@ -82,7 +82,6 @@ def bitcoin_refresh_handler(context):
 
 
 def gui_text():
-    configs = get_configs()
     c = Configs()
 
     currency = getattr(Currency, c.money)
