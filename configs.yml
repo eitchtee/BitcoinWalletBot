@@ -1,7 +1,12 @@
+# Avaliable as a tag
 bot_title: "Bitcoin Wallet Viewer"
 
+# Telegram bot token as provided by BotFather
 telegram_token : ''
+# A list of ints composed of all Telegram user ids
+# you want to be able to use the bot
 allowed_user_ids:
+  - 1234567
 
 update_each: 3600 # seconds
 date_format: "%d/%m/%Y" # datetime compliant format
@@ -17,6 +22,8 @@ wallets:
     address: "aaa1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2"
 
 # BOT STRINGS ---------------------------------------------
+# Each new item is joined by a new line, use \n if you need extra spacing
+
 title:
   - "*{title}*"
 wallet_view:
