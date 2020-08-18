@@ -18,7 +18,7 @@ def final_balance(wallet: str, btc: bool = True):
             return satoshi_confirmado
     except:
         print_exc()
-        return None, None
+        return None
 
 
 def convert_to_money(value, currency):
