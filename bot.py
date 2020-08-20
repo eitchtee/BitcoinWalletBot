@@ -1,6 +1,7 @@
 from random import choice
 import datetime
 import logging
+import os
 
 import yaml
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
@@ -22,7 +23,8 @@ logger = logging.getLogger(__name__)
 
 class Configs:
     def __init__(self):
-        with open('configs.yml', encoding='utf8') as file:
+        configs_path = os.path.join(os.path.dirname(__file__), 'configs.yml')
+        with open(configs_path, encoding='utf8') as file:
             data = yaml.load(file, Loader=yaml.FullLoader)
 
         self.title = data.get("bot_title", "Bitcoin Bot")
@@ -193,4 +195,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    Configs()
