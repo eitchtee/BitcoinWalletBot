@@ -1,6 +1,5 @@
 from random import choice
 import datetime
-import json
 import logging
 
 import yaml
